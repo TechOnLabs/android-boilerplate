@@ -1,4 +1,4 @@
-package com.techonlabs.paginateadapter
+package com.techonlabs.androidboilerplate
 
 import org.junit.Test
 
