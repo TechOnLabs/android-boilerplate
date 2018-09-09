@@ -4,6 +4,10 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: "androidx.navigation.safeargs"
+
+apply plugin: 'kotlin-kapt'
+
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -20,6 +24,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    dataBinding {
+        enabled true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -27,7 +38,42 @@ dependencies {
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.0.0-rc02'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
+    implementation 'androidx.core:core-ktx:1.0.0-rc02'
+
+    //Room
+    implementation "androidx.room:room-runtime:2.0.0-rc01"
+    kapt "androidx.room:room-compiler:2.0.0-rc01"
+    //Coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.23.3'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:0.23.3"
+    //Koin
+    implementation "org.koin:koin-android:1.0.0-RC-2"
+    implementation "org.koin:koin-androidx-viewmodel:1.0.0-RC-2"
+
+    //Paging
+    implementation "androidx.paging:paging-runtime:2.0.0-rc01"
+    implementation "android.arch.work:work-runtime:1.0.0-alpha08"
+
+    //Networking
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.11.0'
+    implementation 'com.jakewharton.retrofit:retrofit2-kotlin-coroutines-experimental-adapter:1.0.0'
+
+    //Logging
+    implementation 'com.jakewharton.timber:timber:4.7.0'
+
+    implementation "androidx.lifecycle:lifecycle-extensions:2.0.0-rc01"
+    annotationProcessor "androidx.lifecycle:lifecycle-compiler:2.0.0-rc01"
+    // Navigation
+    implementation 'android.arch.navigation:navigation-fragment-ktx:1.0.0-alpha05'
+    implementation 'android.arch.navigation:navigation-ui-ktx:1.0.0-alpha05'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
+}
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
 }
