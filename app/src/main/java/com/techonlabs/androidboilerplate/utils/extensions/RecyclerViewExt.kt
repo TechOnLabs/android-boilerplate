@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.techonlabs.androidboilerplate.utils.recyclerView.RecyclerVH
-import com.techonlabs.androidboilerplate.utils.recyclerView.ViewType
+import com.techonlabs.androidboilerplate.utils.recyclerView.StableId
 
 fun RecyclerView.addHorizontalDivider(@DrawableRes drawableInt: Int) {
     val itemDecor = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
@@ -29,6 +29,6 @@ fun RecyclerView.getAutoGridLayoutManager(spanCount: Int = 2, viewsWithFullWidth
     this.layoutManager = gridLayoutManager
 }
 
-fun <T : ViewType> PagedListAdapter<ViewType, RecyclerVH>.submitListV2(pagedList: PagedList<T>?) {
-    submitList(pagedList as PagedList<ViewType>)
+fun <T : StableId> PagedListAdapter<StableId, RecyclerVH>.submitListV2(pagedList: PagedList<T>?) {
+    submitList(pagedList as PagedList<StableId>)
 }

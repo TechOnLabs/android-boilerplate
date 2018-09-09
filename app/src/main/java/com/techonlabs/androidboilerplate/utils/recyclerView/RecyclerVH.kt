@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 open class RecyclerVH(private val binding: ViewDataBinding) : RecyclerView.ViewHolder(binding.root) {
 
-    open fun bind(obj: ViewType, listenerRecycler: OnRecyclerItemClickListener?) {
+    open fun bind(obj: StableId, listenerRecycler: OnRecyclerItemClickListener?) {
         binding.setVariable(BR.obj, obj)
         binding.setVariable(BR.lis, listenerRecycler)
         binding.executePendingBindings()
@@ -16,12 +16,12 @@ open class RecyclerVH(private val binding: ViewDataBinding) : RecyclerView.ViewH
 }
 
 
-//Extend data classes with ViewType
-interface ViewType {
+//Extend data classes with StableId
+interface StableId {
     /** Used to check if the item is changed or not in the list. It should be unique for every cell in list. It is used by DiffCallback*/
-    val uniqueId: String
+    val stableId: String
 }
 
 interface OnRecyclerItemClickListener {
-    fun onRecyclerItemClick(obj: ViewType) {}
+    fun onRecyclerItemClick(obj: StableId) {}
 }

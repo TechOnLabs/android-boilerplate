@@ -4,7 +4,7 @@ import androidx.annotation.Nullable
 import androidx.recyclerview.widget.DiffUtil
 
 
-class DiffCallback(private val oldList: List<ViewType>, private val newList: List<ViewType>) : DiffUtil.Callback() {
+class DiffCallback(private val oldList: List<StableId>, private val newList: List<StableId>) : DiffUtil.Callback() {
 
     override fun getOldListSize() = oldList.size
 
@@ -12,7 +12,7 @@ class DiffCallback(private val oldList: List<ViewType>, private val newList: Lis
 
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int) =
-            oldList[oldItemPosition].uniqueId == newList[newItemPosition].uniqueId
+            oldList[oldItemPosition].stableId == newList[newItemPosition].stableId
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) =
             oldList[oldItemPosition] == newList[newItemPosition]

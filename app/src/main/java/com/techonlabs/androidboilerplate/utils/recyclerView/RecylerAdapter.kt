@@ -11,15 +11,15 @@ import com.techonlabs.androidboilerplate.utils.extensions.bindView
 import timber.log.Timber
 import kotlin.reflect.KClass
 
-open class RecyclerAdapter(private val viewList: MutableMap<KClass<out ViewType>, Int>,
+open class RecyclerAdapter(private val viewList: MutableMap<KClass<out StableId>, Int>,
                            listener: OnRecyclerItemClickListener? = null) : BaseRecyclerAdapter(listener) {
 
     init {
         viewList[EmptyListModel::class] = R.layout.empty_list_cell
     }
 
-    protected var items = mutableListOf<ViewType>()
-    private var emptyListCell: ViewType = EmptyListModel()
+    protected var items = mutableListOf<StableId>()
+    private var emptyListCell: StableId = EmptyListModel()
 
     override fun getObjForPosition(position: Int) = items[position]
     override fun getLayoutIdForPosition(position: Int) = viewList[getObjForPosition(position)::class]
@@ -27,9 +27,9 @@ open class RecyclerAdapter(private val viewList: MutableMap<KClass<out ViewType>
 
     override fun getItemCount() = items.size
 
-    fun getPositionForObj(obj: ViewType) = items.indexOf(obj)
+    fun getPositionForObj(obj: StableId) = items.indexOf(obj)
 
-    fun addItems(items: List<ViewType>?) {
+    fun addItems(items: List<StableId>?) {
         items?.let {
             val initSize = itemCount
             this.items.addAll(items)
@@ -37,14 +37,14 @@ open class RecyclerAdapter(private val viewList: MutableMap<KClass<out ViewType>
         }
     }
 
-    fun addItem(item: ViewType?, pos: Int = itemCount) {
+    fun addItem(item: StableId?, pos: Int = itemCount) {
         if (item != null && pos >= 0) {
             items.add(pos, item)
             notifyItemInserted(pos)
         }
     }
 
-    fun updateItem(prevItem: ViewType?, newItem: ViewType?, notify: Boolean = true) {
+    fun updateItem(prevItem: StableId?, newItem: StableId?, notify: Boolean = true) {
         if (prevItem != null && newItem != null) {
             val index = items.indexOf(prevItem)
             if (index != -1) {
@@ -55,7 +55,7 @@ open class RecyclerAdapter(private val viewList: MutableMap<KClass<out ViewType>
         }
     }
 
-    fun updateItemAt(item: ViewType?, pos: Int) {
+    fun updateItemAt(item: StableId?, pos: Int) {
         if (item != null && pos in 0 until itemCount) {
             items[pos] = item
             notifyItemChanged(pos)
@@ -67,7 +67,7 @@ open class RecyclerAdapter(private val viewList: MutableMap<KClass<out ViewType>
         showEmptyState()
     }
 
-    fun removeItem(item: ViewType?) {
+    fun removeItem(item: StableId?) {
         item?.let {
             val index = items.indexOf(item)
             if (index != -1) {
@@ -85,14 +85,14 @@ open class RecyclerAdapter(private val viewList: MutableMap<KClass<out ViewType>
         }
     }
 
-    fun removeItems(items: List<ViewType>?) {
+    fun removeItems(items: List<StableId>?) {
         items?.let { swapItems(this.items.filter { items.contains(it) }) }
     }
 
     /** fromPos index INCLUDED toPos index NOT_INCLUDED*/
     fun removeRange(fromPos: Int, toPos: Int) {
         if (fromPos <= toPos && fromPos in 0 until itemCount && toPos in 0 until itemCount) {
-            items = items.filterIndexed { index, _ -> index in fromPos until toPos } as MutableList<ViewType>
+            items = items.filterIndexed { index, _ -> index in fromPos until toPos } as MutableList<StableId>
             notifyItemRangeRemoved(fromPos, toPos - fromPos)
         } else
             Timber.e("from index is less than to index")
@@ -101,7 +101,7 @@ open class RecyclerAdapter(private val viewList: MutableMap<KClass<out ViewType>
     }
 
 
-    fun swapItems(items: List<ViewType>?) {
+    fun swapItems(items: List<StableId>?) {
         items?.let {
             val diffCallback = DiffCallback(this.items, items)
             val res = DiffUtil.calculateDiff(diffCallback)
@@ -112,7 +112,7 @@ open class RecyclerAdapter(private val viewList: MutableMap<KClass<out ViewType>
         }
     }
 
-    fun setEmptyListCell(viewType: ViewType) {
+    fun setEmptyListCell(viewType: StableId) {
         emptyListCell = viewType
     }
 
@@ -151,7 +151,7 @@ abstract class BaseRecyclerAdapter(private val listener: OnRecyclerItemClickList
 
     override fun getItemViewType(position: Int) = getLayoutIdForPosition(position)
 
-    protected abstract fun getObjForPosition(position: Int): ViewType
+    protected abstract fun getObjForPosition(position: Int): StableId
 
     protected abstract fun getLayoutIdForPosition(position: Int): Int
 
@@ -160,6 +160,6 @@ abstract class BaseRecyclerAdapter(private val listener: OnRecyclerItemClickList
 /** Empty States*/
 data class EmptyListModel(
         @StringRes val textId: Int = R.string.app_name
-) : ViewType {
-    override val uniqueId = textId.toString()
+) : StableId {
+    override val stableId = textId.toString()
 }
