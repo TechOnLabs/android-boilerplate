@@ -1,5 +1,6 @@
 package com.techonlabs.androidboilerplate.utils
 
+import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import androidx.appcompat.app.AppCompatActivity
@@ -12,7 +13,7 @@ fun SharedPreferences.getString(key: String, defValue: String = ""): String = th
 fun AppCompatActivity.editPrefs(
         commit: Boolean = false,
         action: SharedPreferences.Editor.() -> Unit) {
-    PreferenceManager.getDefaultSharedPreferences(this).edit(commit, action)
+    defaultSharedPreferences.edit(commit, action)
 }
 
 fun Fragment.editPrefs(
@@ -22,10 +23,12 @@ fun Fragment.editPrefs(
 }
 
 inline val Fragment.prefs: SharedPreferences
-    get() {
-        return PreferenceManager.getDefaultSharedPreferences(context
-                ?: throw Exception("Context not found while storing shared preference"))
-    }
+    get() = context?.defaultSharedPreferences
+            ?: throw Exception("Context not found while storing shared preference")
+
+
+inline val Context.defaultSharedPreferences: SharedPreferences
+    get() = PreferenceManager.getDefaultSharedPreferences(this)
 
 
 object Prefs {

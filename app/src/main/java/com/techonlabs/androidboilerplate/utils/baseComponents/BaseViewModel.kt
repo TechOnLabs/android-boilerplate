@@ -3,33 +3,65 @@ package com.techonlabs.androidboilerplate.utils.baseComponents
 import androidx.databinding.Bindable
 import androidx.databinding.Observable
 import androidx.databinding.PropertyChangeRegistry
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.techonlabs.androidboilerplate.FoodEntity
+import com.techonlabs.androidboilerplate.datalayer.network.Network
+import com.techonlabs.androidboilerplate.datalayer.network.NetworkCallback
+import com.techonlabs.androidboilerplate.utils.RequestState
 import kotlinx.coroutines.experimental.CoroutineStart
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.async
+import retrofit2.Response
 
 open class BaseViewModel : ObservableViewModel() {
     protected val parentJob = Job()
+    val requestState = MutableLiveData<RequestState?>()
+
+    init {
+        requestState.value = null
+    }
 
     fun <T> load(job: Job = parentJob, loader: suspend () -> T): Deferred<T> {
         return async(parent = job, start = CoroutineStart.DEFAULT) { loader() }
     }
 
+    infix fun <T> (() -> Deferred<Response<T>>).callback(callbackFunc: (() -> NetworkCallback<T>)) {
+        Network.request(this, callbackFunc, parentJob)
+    }
+
+
     fun <T> getPagedList(dataSourceFactory: DataSource.Factory<Int, T>) =
             LivePagedListBuilder(dataSourceFactory, PagedList.Config.Builder()
-                    .setPageSize(10)
-                    .setInitialLoadSizeHint(10)
+                    .setPageSize(20)
+                    .setInitialLoadSizeHint(20)
                     .setEnablePlaceholders(false)
                     .build()).build()
 
     override fun onCleared() {
         super.onCleared()
         parentJob.cancel()
+    }
+
+
+    fun setStateFetching() {
+        requestState.value = RequestState.Fetching
+    }
+
+    fun setStateSuccess() {
+        requestState.value = RequestState.Success
+    }
+
+    fun setStateFailed() {
+        requestState.value = RequestState.Failed
+    }
+
+    fun setStateNetworkFail() {
+        requestState.value = RequestState.NetworkFail
     }
 
 }

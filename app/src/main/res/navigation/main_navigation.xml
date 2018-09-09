@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/animeFragment">
+
+
+    <fragment
+        android:id="@+id/animeFragment"
+        android:name="com.techonlabs.androidboilerplate.ui.AnimeFragment"
+        android:label="AnimeFragment"
+        tools:layout="@layout/anime_fragment">
+        <action
+            android:id="@+id/action_animeFragment_to_foodFragment"
+            app:destination="@id/foodFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/foodFragment"
+        android:name="com.techonlabs.androidboilerplate.ui.FoodFragment"
+        android:label="FoodFragment"
+        tools:layout="@layout/food_fragment" />
+</navigation>

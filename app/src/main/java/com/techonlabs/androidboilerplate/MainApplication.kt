@@ -11,6 +11,6 @@ class MainApplication : Application() {
         if (BuildConfig.DEBUG)
             Timber.plant(Timber.DebugTree())
         // Start Koin
-        startKoin(this, listOf(myModule))
+        startKoin(this, listOf(koinModule))
     }
 }

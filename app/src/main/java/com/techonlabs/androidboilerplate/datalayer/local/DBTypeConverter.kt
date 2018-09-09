@@ -10,8 +10,7 @@ object GSON {
 }
 
 object DBTypeConverter {
-    private val typeToken = object : TypeToken<List<Int>>() {
-    }.type
+    private val typeToken = object : TypeToken<List<Int>>() {}.type
 
     @TypeConverter
     @JvmStatic

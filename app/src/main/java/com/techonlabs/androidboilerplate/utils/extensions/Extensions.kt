@@ -17,11 +17,15 @@ import androidx.annotation.AttrRes
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.textfield.TextInputEditText
+import com.techonlabs.androidboilerplate.GlideApp
 import com.techonlabs.androidboilerplate.R
 
 fun <T : ViewDataBinding?> ViewGroup.bindView(layoutId: Int, attachToRoot: Boolean = false) =
@@ -145,4 +149,17 @@ fun Fragment.adjustResize() {
     activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 }
 
+fun AppCompatImageView.loadImg(url: String) {
+    val ro = RequestOptions()
+            .placeholder(R.drawable.ic_launcher_background)
+            .error(R.drawable.ic_launcher_background)
+            .fallback(R.drawable.ic_launcher_foreground)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+
+    GlideApp.with(context)
+            .applyDefaultRequestOptions(ro)
+            .load(url)
+            .centerCrop()
+            .into(this)
+}
 

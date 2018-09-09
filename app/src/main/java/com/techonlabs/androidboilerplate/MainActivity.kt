@@ -1,51 +1,46 @@
 package com.techonlabs.androidboilerplate
 
+import android.content.res.Resources
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
-import com.techonlabs.androidboilerplate.utils.extensions.submitListV2
-import com.techonlabs.androidboilerplate.utils.extensions.toast
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.NavigationUI
 import com.techonlabs.androidboilerplate.utils.recyclerView.OnRecyclerItemClickListener
-import com.techonlabs.androidboilerplate.utils.recyclerView.PagedRecyclerAdapter
-import com.techonlabs.androidboilerplate.utils.recyclerView.RecyclerAdapter
-import com.techonlabs.androidboilerplate.utils.recyclerView.StableId
-import kotlinx.android.synthetic.main.activity_main.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import timber.log.Timber
 
 class MainActivity : AppCompatActivity(), OnRecyclerItemClickListener {
-
-    private val vm: MainVM by viewModel()
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        //Inserting data in local database
-        vm.fillDb()
-//        addRecyclerAdapter()
-        addPagedRecyclerAdapter()
+        setContentView(R.layout.main_activity)
+        val host = supportFragmentManager
+                .findFragmentById(R.id.mainHostFragment) as NavHostFragment? ?: return
+        navController = host.navController
 
-
-    }
-
-    fun addRecyclerAdapter() {
-        RecyclerAdapter(mutableMapOf(FoodEntity::class to R.layout.list_cell), this).let { adapter ->
-            foodListView.adapter = adapter
-            vm.foodDao.get().observe(this, Observer {
-                adapter.swapItems(it)
-            })
+        navController.addOnNavigatedListener { _, destination ->
+            val dest: String = try {
+                resources.getResourceName(destination.id)
+            } catch (e: Resources.NotFoundException) {
+                Integer.toString(destination.id)
+            }
+            Timber.v("Navigated to $dest")
         }
     }
 
-    fun addPagedRecyclerAdapter() {
-        PagedRecyclerAdapter(mutableMapOf(FoodEntity::class to R.layout.list_cell), this).let {
-            foodListView.adapter = it
-            vm.foodList.observe(this, Observer(it::submitListV2))
-        }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Have the NavHelper look for an action or destination matching the menu
+        // item id and navigate there if found.
+        // Otherwise, bubble up to the parent.
+        return NavigationUI.onNavDestinationSelected(item,
+                Navigation.findNavController(this, R.id.mainHostFragment))
+                || super.onOptionsItemSelected(item)
     }
 
-    override fun onRecyclerItemClick(obj: StableId) {
-        super.onRecyclerItemClick(obj)
-        if (obj is FoodEntity)
-            toast(obj.name)
-    }
+    override fun onSupportNavigateUp() =
+            Navigation.findNavController(findViewById(R.id.mainHostFragment)).navigateUp()
+
 }

@@ -9,6 +9,10 @@ import kotlin.reflect.KClass
 class PagedRecyclerAdapter(private val viewList: Map<KClass<out StableId>, Int>,
                            private val listener: OnRecyclerItemClickListener? = null) :
         PagedListAdapter<StableId, RecyclerVH>(diffCallback) {
+    init {
+        setHasStableIds(true)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             RecyclerVH(parent.bindView(viewType))
 

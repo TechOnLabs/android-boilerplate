@@ -9,6 +9,9 @@ import com.techonlabs.androidboilerplate.R
 
 open class RecyclerVH(private val binding: ViewDataBinding) : RecyclerView.ViewHolder(binding.root) {
 
+    /**NOTE use only obj, lis as variable names inside xml files
+     * obj: it is the class linked to the view
+     * lis: it is the listener added to the view*/
     open fun bind(obj: StableId, listenerRecycler: OnRecyclerItemClickListener?) {
         binding.setVariable(BR.obj, obj)
         binding.setVariable(BR.lis, listenerRecycler)
