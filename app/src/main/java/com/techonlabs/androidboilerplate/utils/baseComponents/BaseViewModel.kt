@@ -4,6 +4,10 @@ import androidx.databinding.Bindable
 import androidx.databinding.Observable
 import androidx.databinding.PropertyChangeRegistry
 import androidx.lifecycle.ViewModel
+import androidx.paging.DataSource
+import androidx.paging.LivePagedListBuilder
+import androidx.paging.PagedList
+import com.techonlabs.androidboilerplate.FoodEntity
 import kotlinx.coroutines.experimental.CoroutineStart
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.Job
@@ -15,6 +19,13 @@ open class BaseViewModel : ObservableViewModel() {
     fun <T> load(job: Job = parentJob, loader: suspend () -> T): Deferred<T> {
         return async(parent = job, start = CoroutineStart.DEFAULT) { loader() }
     }
+
+    fun <T> getPagedList(dataSourceFactory: DataSource.Factory<Int, T>) =
+            LivePagedListBuilder(dataSourceFactory, PagedList.Config.Builder()
+                    .setPageSize(10)
+                    .setInitialLoadSizeHint(10)
+                    .setEnablePlaceholders(false)
+                    .build()).build()
 
     override fun onCleared() {
         super.onCleared()

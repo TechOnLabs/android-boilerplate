@@ -1,16 +1,21 @@
 package com.techonlabs.androidboilerplate
 
+import androidx.paging.LivePagedListBuilder
+import androidx.paging.PagedList
 import com.techonlabs.androidboilerplate.datalayer.local.FoodDao
 import com.techonlabs.androidboilerplate.utils.baseComponents.BaseViewModel
-import com.techonlabs.androidboilerplate.utils.extensions.then
 import timber.log.Timber
 
-class MainVM(val foodDao: FoodDao) : BaseViewModel() {
+class MainVM(private val foodDao: FoodDao) : BaseViewModel() {
 
     fun fillDb() {
-        load { Timber.tag("Foood").i("Working")
-            foodDao.insert(foodTypes.mapIndexed { index, s ->   FoodEntity(id = index, name = s) }) }then {it}
+        load {
+            Timber.tag("Foood").i("Working")
+            foodDao.insert(foodTypes.mapIndexed { index, s -> FoodEntity(id = index, name = s) })
+        }
     }
+
+    val foodList = getPagedList(foodDao.getPaged())
 }
 
 

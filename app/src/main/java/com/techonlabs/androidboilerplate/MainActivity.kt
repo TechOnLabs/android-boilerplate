@@ -3,8 +3,10 @@ package com.techonlabs.androidboilerplate
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import com.techonlabs.androidboilerplate.utils.extensions.submitListV2
+import com.techonlabs.androidboilerplate.utils.recyclerView.PagedRecyclerAdapter
+import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
@@ -15,8 +17,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         //Inserting data in local database
         vm.fillDb()
-        vm.foodDao.get().observe(this, Observer {
-            Timber.tag("Foood").i(it.toString()+"\n")
-        })
+
+        PagedRecyclerAdapter(mutableMapOf(FoodEntity::class to R.layout.list_cell)).let {
+            foodListView.adapter = it
+            vm.foodList.observe(this, Observer(it::submitListV2))
+        }
+
     }
 }
