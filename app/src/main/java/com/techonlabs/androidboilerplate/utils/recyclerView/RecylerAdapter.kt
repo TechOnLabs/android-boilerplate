@@ -1,9 +1,6 @@
-@file:Suppress("UNCHECKED_CAST")
-
 package com.techonlabs.androidboilerplate.utils.recyclerView
 
 import android.view.ViewGroup
-import androidx.annotation.StringRes
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.techonlabs.androidboilerplate.R
@@ -12,7 +9,7 @@ import timber.log.Timber
 import kotlin.reflect.KClass
 
 open class RecyclerAdapter(private val viewList: MutableMap<KClass<out StableId>, Int>,
-                           listener: OnRecyclerItemClickListener? = null) : BaseRecyclerAdapter(listener) {
+                           private val listener: OnRecyclerItemClickListener? = null) : RecyclerView.Adapter<RecyclerVH>() {
 
     init {
         viewList[EmptyListModel::class] = R.layout.empty_list_cell
@@ -21,11 +18,26 @@ open class RecyclerAdapter(private val viewList: MutableMap<KClass<out StableId>
     protected var items = mutableListOf<StableId>()
     private var emptyListCell: StableId = EmptyListModel()
 
-    override fun getObjForPosition(position: Int) = items[position]
-    override fun getLayoutIdForPosition(position: Int) = viewList[getObjForPosition(position)::class]
+
+    override fun getItemViewType(position: Int) = viewList[getObjForPosition(position)::class]
             ?: throw Exception("View not found for ${getObjForPosition(position)::class}")
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+            RecyclerVH(parent.bindView(viewType))
+
+    override fun onBindViewHolder(holder: RecyclerVH, position: Int, payloads: MutableList<Any>) {
+        super.onBindViewHolder(holder, position, payloads)
+        getObjForPosition(position).let { holder.bind(it, listener) }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerVH, position: Int) {
+        getObjForPosition(position).let { holder.bind(it, listener) }
+    }
+
     override fun getItemCount() = items.size
+
+    fun getObjForPosition(position: Int) = items[position]
+
 
     fun getPositionForObj(obj: StableId) = items.indexOf(obj)
 
@@ -132,34 +144,4 @@ open class RecyclerAdapter(private val viewList: MutableMap<KClass<out StableId>
     }
 
 
-}
-
-abstract class BaseRecyclerAdapter(private val listener: OnRecyclerItemClickListener?) : RecyclerView.Adapter<RecyclerVH>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-            RecyclerVH(parent.bindView(viewType))
-
-    override fun onBindViewHolder(holder: RecyclerVH, position: Int, payloads: MutableList<Any>) {
-        super.onBindViewHolder(holder, position, payloads)
-        getObjForPosition(position).let { holder.bind(it, listener) }
-    }
-
-
-    override fun onBindViewHolder(holder: RecyclerVH, position: Int) {
-        getObjForPosition(position).let { holder.bind(it, listener) }
-
-    }
-
-    override fun getItemViewType(position: Int) = getLayoutIdForPosition(position)
-
-    protected abstract fun getObjForPosition(position: Int): StableId
-
-    protected abstract fun getLayoutIdForPosition(position: Int): Int
-
-}
-
-/** Empty States*/
-data class EmptyListModel(
-        @StringRes val textId: Int = R.string.app_name
-) : StableId {
-    override val stableId = textId.toString()
 }

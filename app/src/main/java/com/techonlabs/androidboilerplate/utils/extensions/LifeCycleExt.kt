@@ -25,7 +25,7 @@ internal val Background = newFixedThreadPoolContext(Runtime.getRuntime().availab
  * The coroutine is automatically cancelled using the CoroutineLifecycleListener.
  */
 fun <T> LifecycleOwner.load(loader: suspend () -> T): Deferred<T> {
-    val deferred = async(context = Background, start = CoroutineStart.LAZY) {
+    val deferred = async(context = Background, start = CoroutineStart.DEFAULT) {
         loader()
     }
 

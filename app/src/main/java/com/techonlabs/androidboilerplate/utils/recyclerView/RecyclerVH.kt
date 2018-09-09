@@ -1,8 +1,10 @@
 package com.techonlabs.androidboilerplate.utils.recyclerView
 
+import androidx.annotation.StringRes
 import androidx.databinding.ViewDataBinding
 import androidx.databinding.library.baseAdapters.BR
 import androidx.recyclerview.widget.RecyclerView
+import com.techonlabs.androidboilerplate.R
 
 
 open class RecyclerVH(private val binding: ViewDataBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -19,9 +21,17 @@ open class RecyclerVH(private val binding: ViewDataBinding) : RecyclerView.ViewH
 //Extend data classes with StableId
 interface StableId {
     /** Used to check if the item is changed or not in the list. It should be unique for every cell in list. It is used by DiffCallback*/
-    val stableId: String
+    fun getStableId(): String
 }
 
 interface OnRecyclerItemClickListener {
     fun onRecyclerItemClick(obj: StableId) {}
+}
+
+
+/** Empty States*/
+data class EmptyListModel(
+        @StringRes val textId: Int = R.string.app_name
+) : StableId {
+    override fun getStableId() = textId.toString()
 }

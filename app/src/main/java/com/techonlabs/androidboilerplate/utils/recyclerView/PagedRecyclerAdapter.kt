@@ -23,7 +23,7 @@ class PagedRecyclerAdapter(private val viewList: Map<KClass<out StableId>, Int>,
         private val diffCallback = object : DiffUtil.ItemCallback<StableId>() {
 
             override fun areItemsTheSame(oldItem: StableId, newItem: StableId) =
-                    oldItem.stableId == newItem.stableId
+                    oldItem.getStableId() == newItem.getStableId()
 
             override fun areContentsTheSame(oldItem: StableId, newItem: StableId) =
                     oldItem == newItem

@@ -8,6 +8,9 @@ apply plugin: "androidx.navigation.safeargs"
 
 apply plugin: 'kotlin-kapt'
 
+androidExtensions {
+    experimental = true
+}
 android {
     compileSdkVersion 28
     defaultConfig {

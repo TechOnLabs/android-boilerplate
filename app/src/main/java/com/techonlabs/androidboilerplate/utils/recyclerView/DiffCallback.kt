@@ -12,7 +12,7 @@ class DiffCallback(private val oldList: List<StableId>, private val newList: Lis
 
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int) =
-            oldList[oldItemPosition].stableId == newList[newItemPosition].stableId
+            oldList[oldItemPosition].getStableId() == newList[newItemPosition].getStableId()
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) =
             oldList[oldItemPosition] == newList[newItemPosition]
