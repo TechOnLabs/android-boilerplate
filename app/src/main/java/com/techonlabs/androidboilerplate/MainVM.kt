@@ -1,12 +1,10 @@
 package com.techonlabs.androidboilerplate
 
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
 import com.techonlabs.androidboilerplate.datalayer.local.FoodDao
 import com.techonlabs.androidboilerplate.utils.baseComponents.BaseViewModel
 import timber.log.Timber
 
-class MainVM(private val foodDao: FoodDao) : BaseViewModel() {
+class MainVM(val foodDao: FoodDao) : BaseViewModel() {
 
     fun fillDb() {
         load {
