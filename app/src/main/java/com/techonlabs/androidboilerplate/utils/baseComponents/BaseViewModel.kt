@@ -30,8 +30,8 @@ open class BaseViewModel : ObservableViewModel() {
         return async(parent = job, start = CoroutineStart.DEFAULT) { loader() }
     }
 
-    infix fun <T> (() -> Deferred<Response<T>>).callback(callbackFunc: (() -> NetworkCallback<T>)) {
-        Network.request(this, callbackFunc, parentJob)
+     fun <T> Deferred<Response<T>>.callback(callback: NetworkCallback<T>,requestState: MutableLiveData<RequestState?> = this@BaseViewModel.requestState) {
+        Network.request(this, callback, parentJob, requestState)
     }
 
 
@@ -40,7 +40,8 @@ open class BaseViewModel : ObservableViewModel() {
                     .setPageSize(20)
                     .setInitialLoadSizeHint(20)
                     .setEnablePlaceholders(false)
-                    .build()).build()
+                    .build())
+                    .build()
 
     override fun onCleared() {
         super.onCleared()

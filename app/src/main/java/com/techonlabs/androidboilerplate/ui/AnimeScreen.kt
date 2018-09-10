@@ -37,16 +37,16 @@ class AnimeFragment : BaseFragment() {
             it?.let {
                 when (it) {
                     RequestState.Success -> {
-                        toast("List fetched")
+                        toast("List fetched ${it.message}")
                     }
                     RequestState.Fetching -> {
-                        toast("Please wait! Loading anime list")
+                        toast("Please wait! Loading anime list ${it.message}")
                     }
                     RequestState.Failed -> {
-                        toast("Request failed")
+                        toast("Request failed ${it.message}")
                     }
                     RequestState.NetworkFail -> {
-                        toast("No internet connection")
+                        toast("No internet connection ${it.message}")
                     }
                 }
             }
@@ -54,10 +54,6 @@ class AnimeFragment : BaseFragment() {
         PagedRecyclerAdapter(mutableMapOf(VoiceActorEntity::class to R.layout.anime_cell), this).let { adapter ->
             binding.animeListView.adapter = adapter
             vm.animeList.observe(this, Observer(adapter::submitListV2))
-//            vm.animeList.observe(this, Observer {
-//                it.dataSource
-//                adapter.submitListV2(it)
-//            })
         }
 
     }
@@ -81,29 +77,22 @@ class AnimeVM(private val apiInterface: ApiInterface,
 
     init {
         getAnime()
-        setStateFetching()
     }
 
     fun getAnime() {
-        { apiInterface.getAnime() } callback {
-            NetworkCallback<AnimeModel>().apply {
-                success = {
-                    setStateSuccess()
-                    load {
-                        it.characters.forEach {
-                            animeDao.insert(it.voice_actors)
+        apiInterface.getAnime().callback(
+                NetworkCallback<AnimeModel>().apply {
+                    success = {
+                        load {
+                            it.characters.forEach {
+                                animeDao.insert(it.voice_actors)
+                            }
                         }
                     }
-
+                    error = {}
+                    httpError = {}
                 }
-                error = {
-                    setStateNetworkFail()
-                }
-                httpError = {
-                    setStateFailed()
-                }
-            }
-        }
+        )
     }
 
     val animeList = getPagedList(animeDao.getPaged())

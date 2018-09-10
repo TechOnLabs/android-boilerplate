@@ -1,5 +1,8 @@
 package com.techonlabs.androidboilerplate.datalayer.network
 
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import com.techonlabs.androidboilerplate.utils.RequestState
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.UI
@@ -11,48 +14,61 @@ import java.io.IOException
 
 object Network {
 
-    fun <T> request(callFunc: (() -> Deferred<Response<T>>), callbackFunc: (() -> NetworkCallback<T>), parentJob: Job) {
-        val callback = callbackFunc()
-        request(callFunc = callFunc,
+    fun <T> request(networkCall: Deferred<Response<T>>, callback: NetworkCallback<T>, parentJob: Job,
+                    requestState: MutableLiveData<RequestState?>) {
+        request(networkCall = networkCall,
                 onSuccess = callback.success,
                 onHttpError = callback.httpError,
                 onErrors = callback.error,
-                callbackFunc = callbackFunc,
-                parentJob = parentJob)
+                callback = callback,
+                parentJob = parentJob,
+                requestState = requestState)
     }
 
-    private fun <T> request(callFunc: (() -> Deferred<Response<T>>),
+    private fun <T> request(networkCall: Deferred<Response<T>>,
                             onSuccess: ((T) -> Unit)?,
                             onHttpError: ((Response<T>) -> Unit)?,
                             onErrors: ((Throwable) -> Unit)?,
-                            callbackFunc: (() -> NetworkCallback<T>),
-                            parentJob: Job) {
-        var fetchState: FetchState
+                            callback: NetworkCallback<T>,
+                            parentJob: Job, requestState: MutableLiveData<RequestState?>) {
+        requestState.value = RequestState.Fetching
+        requestState.value
         launch(UI, parent = parentJob) {
             try {
-                onSuccess?.let {
-                    val response = callFunc().await()
-                    if (response.isSuccessful) {
-                        fetchState = FetchState.SUCCESS
+                val response = networkCall.await()
+                if (response.isSuccessful) {
+                    RequestState.Success.let {
+                        it.message = response.message()
+                        requestState.value = it
+                    }
+
+                    onSuccess?.let {
                         onSuccess(response.body()!!)
-                    } else {
-                        fetchState = FetchState.FAILED
-                        //Basically http exceptions like 404 or 500
-                        // a non-2XX response was received
-                        httpErrorHandler(response = response, callFunc = callFunc, callbackFunc = callbackFunc, parentJob = parentJob)
-                        onHttpError?.let {
-                            onHttpError(response)
-                        }
+                    }
+                } else {
+                    RequestState.Failed.let {
+                        it.message = response.message()
+                        requestState.value = it
+                    }
+                    //Basically http exceptions like 404 or 500
+                    // a non-2XX response was received
+                    httpErrorHandler(response = response, networkCall = networkCall, callback = callback, parentJob = parentJob)
+                    onHttpError?.let {
+                        onHttpError(response)
                     }
                 }
+
             } catch (t: Throwable) {
-                fetchState = FetchState.FAILED
+                RequestState.NetworkFail.let {
+                    it.message = t.message?:"Error occurred"
+                    requestState.value = it
+                }
                 // a networking or data conversion error
                 onErrors?.let {
                     if (t is IOException) {
                         //network error
                         Timber.e(t)
-                        errorHandler(callFunc = callFunc, callbackFunc = callbackFunc, parentJob = parentJob)
+                        errorHandler(networkCall = networkCall, callback = callback, parentJob = parentJob)
                         onErrors(t)
                     }
                 }
@@ -61,7 +77,7 @@ object Network {
     }
 
 
-    private fun <T> httpErrorHandler(response: Response<T>, callFunc: (() -> Deferred<Response<T>>), callbackFunc: (() -> NetworkCallback<T>), parentJob: Job) {
+    private fun <T> httpErrorHandler(response: Response<T>, networkCall: Deferred<Response<T>>, callback: NetworkCallback<T>, parentJob: Job) {
         //TODO:Add code fo error handling
         when (response.code()) {
             HttpErrors.NOT_FOUND.value -> {
@@ -70,18 +86,12 @@ object Network {
         }
     }
 
-    private fun <T> errorHandler(callFunc: (() -> Deferred<Response<T>>), callbackFunc: (() -> NetworkCallback<T>), parentJob: Job) {
+    private fun <T> errorHandler(networkCall: Deferred<Response<T>>, callback: NetworkCallback<T>, parentJob: Job) {
         //TODO:Add code fo error handling
     }
 }
 
 enum class HttpErrors(val value: Int) {
     NOT_FOUND(404)
-}
-
-enum class FetchState {
-    FETCHING,
-    SUCCESS,
-    FAILED
 }
 
