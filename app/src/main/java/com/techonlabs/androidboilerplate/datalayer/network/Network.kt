@@ -32,7 +32,6 @@ object Network {
                             callback: NetworkCallback<T>,
                             parentJob: Job, requestState: MutableLiveData<RequestState?>) {
         requestState.value = RequestState.Fetching
-        requestState.value
         launch(UI, parent = parentJob) {
             try {
                 val response = networkCall.await()

@@ -30,8 +30,9 @@ open class BaseViewModel : ObservableViewModel() {
         return async(parent = job, start = CoroutineStart.DEFAULT) { loader() }
     }
 
-     fun <T> Deferred<Response<T>>.callback(callback: NetworkCallback<T>,requestState: MutableLiveData<RequestState?> = this@BaseViewModel.requestState) {
-        Network.request(this, callback, parentJob, requestState)
+     fun <T> Deferred<Response<T>>.callback(requestState: MutableLiveData<RequestState?> = this@BaseViewModel.requestState,
+                                            callbacks: NetworkCallback<T>.()->Unit) {
+        Network.request(this, NetworkCallback<T>().apply(callbacks), parentJob, requestState)
     }
 
 

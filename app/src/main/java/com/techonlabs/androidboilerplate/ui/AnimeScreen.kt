@@ -5,13 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-import com.techonlabs.androidboilerplate.AnimeModel
 import com.techonlabs.androidboilerplate.R
 import com.techonlabs.androidboilerplate.VoiceActorEntity
 import com.techonlabs.androidboilerplate.databinding.AnimeFragmentBinding
 import com.techonlabs.androidboilerplate.datalayer.local.AnimeDao
 import com.techonlabs.androidboilerplate.datalayer.network.ApiInterface
-import com.techonlabs.androidboilerplate.datalayer.network.NetworkCallback
 import com.techonlabs.androidboilerplate.utils.RequestState
 import com.techonlabs.androidboilerplate.utils.baseComponents.BaseFragment
 import com.techonlabs.androidboilerplate.utils.baseComponents.BaseViewModel
@@ -80,19 +78,17 @@ class AnimeVM(private val apiInterface: ApiInterface,
     }
 
     fun getAnime() {
-        apiInterface.getAnime().callback(
-                NetworkCallback<AnimeModel>().apply {
-                    success = {
-                        load {
-                            it.characters.forEach {
-                                animeDao.insert(it.voice_actors)
-                            }
-                        }
+        apiInterface.getAnime().callback {
+            success = {
+                load {
+                    it.characters.forEach {
+                        animeDao.insert(it.voice_actors)
                     }
-                    error = {}
-                    httpError = {}
                 }
-        )
+            }
+            error = {}
+            httpError = {}
+        }
     }
 
     val animeList = getPagedList(animeDao.getPaged())
